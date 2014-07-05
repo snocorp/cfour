@@ -1,0 +1,53 @@
+/* CSS declarations go here */
+body {
+  margin-top: 60px;
+}
+
+.login-buttons-container {
+  margin-top: 8px;
+}
+
+.games {
+  position:absolute;
+  width: 300px;
+  background-color: #666;
+  color: #fff;
+  margin: 0 8px;
+  padding: 4px;
+}
+
+.board {
+  position: absolute;
+  margin-left: 324px;
+}
+
+.game-rack {
+  
+}
+
+.game-rack td {
+  height: 35px;
+  width: 35px;
+  padding: 4px;
+  background-color: #e6d63d;
+  text-align: center;
+}
+
+.circle {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+}
+
+.circle.clear {
+  background-color: #fff;
+}
+
+.circle.black {
+  background-color: black;
+}
+
+.circle.red {
+  background-color: red;
+}

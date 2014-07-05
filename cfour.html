@@ -1,0 +1,66 @@
+<head>
+  <title>cfour</title>
+</head>
+
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="brand">Connect Four</span>
+        <div class="login-buttons-container pull-right">
+          {{> loginButtons align="right"}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="header navbar">
+    
+    <h1></h1>
+  </div>
+  <div class="games">
+    {{> games}}
+  </div>
+  <div class="board">
+    {{> board}}
+  </div>
+</body>
+
+<template name="games">
+  {{#if currentUser}}
+    <button id="idNewGame">New Game</button>
+    {{#if list.length}}
+      <p>Play against:</p>
+      <ul class="games-list">
+        {{#each list}}
+        <li><a href="#">{{player1.name}}</a></li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  {{else}}
+    <p>Sign in to get started!</p>
+  {{/if}}
+</template>
+
+<template name="board">
+  {{#if game}}
+    <p>{{game.player1.name}}<br/>
+    vs<br/>
+    {{#if game.player2}}
+      {{game.player2.name}}
+    {{else}}
+      TBD  
+    {{/if}}
+    </p>
+    <div>
+      <table class="game-rack">
+        {{#each rows}}
+        <tr>
+          {{#each this}}
+          <td><div class="circle {{this.state}}"></div></td>
+          {{/each}}
+        </tr>
+        {{/each}}
+      </table>
+    </div>
+  {{/if}}
+</template>
