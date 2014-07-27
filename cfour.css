@@ -1,33 +1,13 @@
 /* CSS declarations go here */
-body {
-  margin-top: 60px;
-}
-
-.login-buttons-container {
-  margin-top: 8px;
-}
-
-.games {
-  position:absolute;
-  width: 300px;
-  background-color: #666;
-  color: #fff;
-  margin: 0 8px;
-  padding: 4px;
-}
-
-.board {
-  position: absolute;
-  margin-left: 324px;
-}
+body { padding-top: 70px; }
 
 .game-rack {
-  
+  width: 350px;
 }
 
 .game-rack td {
-  height: 35px;
-  width: 35px;
+  height: 50px;
+  width: 50px;
   padding: 4px;
   background-color: #e6d63d;
   text-align: center;
@@ -35,9 +15,9 @@ body {
 
 .circle {
   display: inline-block;
-  height: 30px;
-  width: 30px;
-  border-radius: 15px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
 }
 
 .circle.clear {
@@ -50,4 +30,25 @@ body {
 
 .circle.red {
   background-color: red;
+}
+
+.circle.win {
+  border: 2px solid cyan;
+}
+
+@media (min-width: 768px) {
+  .game-rack {
+    width: 630px;
+  }
+
+  .game-rack td {
+    height: 90px;
+    width: 90px;
+  }
+
+.circle {
+  height: 80px;
+  width: 80px;
+  border-radius: 40px;
+}
 }
