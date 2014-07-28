@@ -1,6 +1,11 @@
 Games = new Meteor.Collection('games');
 
 if (Meteor.isClient) {
+  Meteor.subscribe('games');
+  
+  /**
+   * Returns the user's current game if it exists.
+   */
   function getCurrentGame() {
     var game = null;
     var user = Meteor.user();
@@ -12,8 +17,15 @@ if (Meteor.isClient) {
     return game;
   }
   
-  
+  /**
+   * Returns data about the given game's next turn.
+   *
+   * @param game The game
+   *
+   * @return a structure containing the player and color of the next turn.
+   */
   function getNextTurn(game) {
+    //use the number of chips to determine the next player
     var chipCount = 0;
     game.board.forEach(function(tile) {
       if (tile.state !== 'clear') {
@@ -29,6 +41,7 @@ if (Meteor.isClient) {
         color: 'red'
       };
     } else {
+      //black turn
       turn = {
         player: game.player2,
         color: 'black'
@@ -38,7 +51,21 @@ if (Meteor.isClient) {
     return turn;
   }
   
+  function abandonCurrentGame() {
+    var game = getCurrentGame();
+    if (game && game.state === 'active') {
+      //set the current game to abandoned
+      Games.update({_id: game._id}, {
+        $set: {
+          state: 'abandoned'
+        }
+      });
+    }
+  }
   
+  /**
+   * Returns a list of the available games. This includes those that are have onloy one player and that player is not the current user.
+   */
   Template.games.list = function() {
     var list = [];
     var user = Meteor.user();
@@ -54,23 +81,18 @@ if (Meteor.isClient) {
     return list;
   };
   
-  Template.games.game = getCurrentGame;
-  
+  /**
+   * Event handlers
+   */
   Template.games.events({
+    /** Handle clicking the New Game link */
     'click #idNewGame': function () {
       var user = Meteor.user();
       
       if (user) {
-        var game = getCurrentGame();
-        if (game && game.state === 'active') {
-          //set the current game to abandoned
-          Games.update({_id: game._id}, {
-            $set: {
-              state: 'abandoned'
-            }
-          });
-        }
+        abandonCurrentGame();
         
+        // setup a new board, all clear
         var i;
         var b = new Array(42);
         for (i = 0; i < b.length; i += 1) {
@@ -91,25 +113,19 @@ if (Meteor.isClient) {
           state: 'active'
         });
 
+        //put the game id in the user's profile
         Meteor.users.update({_id: user._id}, {
           $set: {profile: {game: gameId}}
         });
       }
     },
+    /** Habndle a click on a game in the games list */
     'click ul.games-list a': function() {
       var game = this;
       var user = Meteor.user();
       
       if (user && game) {
-        var currentGame = getCurrentGame();
-        if (currentGame && currentGame.state === 'active') {
-          //set the current game to abandoned
-          Games.update({_id: currentGame._id}, {
-            $set: {
-              state: 'abandoned'
-            }
-          });
-        }
+        abandonCurrentGame();
         
         Meteor.users.update({_id: user._id}, {
           $set: {profile: {game: game._id}}
@@ -127,8 +143,14 @@ if (Meteor.isClient) {
     }
   });
   
+  /**
+   * Add the current game info to the template.
+   */
   Template.board.game = getCurrentGame;
   
+  /**
+   * Returns a string describing the status of the game.
+   */
   Template.board.status = function() {
     var status = '', game = getCurrentGame(), user = Meteor.user();
     if (game) {
@@ -162,6 +184,9 @@ if (Meteor.isClient) {
     return status;
   };
   
+  /**
+   * Returns a list of rows in the game board.
+   */
   Template.board.rows = function() {
     var i;
     var game = Template.board.game();
@@ -174,7 +199,11 @@ if (Meteor.isClient) {
     return rows;
   };
   
+  /**
+   * Event handlers
+   */
   Template.board.events({
+    /** Handle a click on a clear circle */
     'click .game-rack .circle.clear': function() {
       var user = Meteor.user();
       
@@ -271,15 +300,15 @@ if (Meteor.isClient) {
                   break;
                 }
               }
-            } else {
+            } /*else {
               console.log("Wait your turn");
-            }
-          } else {
+            }*/
+          } /*else {
             console.log('The game has ended');
-          }
-        } else {
+          }*/
+        } /*else {
           console.log("The game hasn't started");
-        }
+        }*/
       }
     }
   });
@@ -287,6 +316,21 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    // code to run on server at startup
+    Games.allow({
+      insert: function (userId, game) {
+        return true;
+      },
+      update: function (userId, game) {
+        return userId && (
+          (game.player1 && game.player1.id === userId) ||
+          (game.player2 && game.player2.id === userId) ||
+          (!game.player2)
+        );
+      }
+    });
+    
+    Meteor.publish('games', function () {
+      return Games.find();
+    });
   });
 }
